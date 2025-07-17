@@ -23,6 +23,9 @@ export class Reel {
   }
 
   async spin() {
+    // F.eks. vent 500 ms for at simulere spin
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     for (let y = 0; y < this.rows; y++) {
       const newSymbol = this.mechanics.getRandomSymbol();
       const sprite = this.symbols[y].sprite;
