@@ -1,99 +1,48 @@
 import * as PIXI from 'pixi.js';
 import { Reels } from './Reels.js';
 import { GUI } from './GUI.js';
+import { Mechanics } from './Mechanics.js';
 
 export class Game {
   constructor() {
     this.container = new PIXI.Container();
+    this.mechanics = new Mechanics();
 
     const bg = PIXI.Sprite.from('/assets/images/baggrund.png');
     this.container.addChild(bg);
 
-    this.reels = new Reels();
-    this.reels.container.x = 300;
-    this.reels.container.y = 80;
+    this.reels = new Reels(this.mechanics); // ✅ pas mechanics med
     this.container.addChild(this.reels.container);
 
     this.gui = new GUI(() => this.spin());
     this.container.addChild(this.gui.container);
 
-    this.inBonus = false;
-    this.bonusSpinsLeft = 0;
+    // Mascot (kan opdateres i resize)
+    this.mascot = PIXI.Sprite.from('/assets/images/mascot_cindy_front.png');
+    this.mascot.width = 200;
+    this.mascot.height = 300;
+    this.container.addChild(this.mascot);
 
-    this.bonusText = new PIXI.Text({
-      text: '',
-      style: {
-        fontFamily: 'Arial',
-        fontSize: 24,
-        fill: 'gold',
-        stroke: { color: 0x000000, thickness: 4 }
-      }
-    });
-    this.bonusText.x = 550;
-    this.bonusText.y = 50;
-    this.container.addChild(this.bonusText);
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+  }
 
+  resize() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    this.reels.container.x = (width - this.reels.container.width) / 2;
+    this.reels.container.y = 100;
+
+    this.mascot.x = this.reels.container.x - this.mascot.width - 40;
+    this.mascot.y = this.reels.container.y + (this.reels.container.height - this.mascot.height) / 2;
   }
 
   async start() {
-    // Her kan du fx køre intro-spin
     console.log('Game started');
   }
 
- async spin() {
-  this.gui.setEnabled(false);
-  await this.reels.spin();
-
-  let hasMatches = false;
-  do {
-    const groups = this.reels.findConnectedGroups();
-    hasMatches = groups.length > 0;
-
-    if (hasMatches) {
-      await this.reels.tumble(groups);
-    }
-  } while (hasMatches);
-
-  const scatterCount = this.reels.countScatters();
-  if (!this.inBonus && scatterCount >= 3) {
-    this.startBonus();
+  async spin() {
+    await this.reels.spin();
   }
-
-  this.gui.setEnabled(!this.inBonus);
-
-  if (this.inBonus) {
-    this.bonusSpinsLeft--;
-    this.updateBonusText();
-    if (this.bonusSpinsLeft > 0) {
-      setTimeout(() => this.spin(), 500);
-    } else {
-      this.endBonus();
-    }
-  }
-}
-
-
-
-
-  startBonus() {
-    this.inBonus = true;
-    this.bonusSpinsLeft = 10;
-    this.updateBonusText();
-    console.log('🟡 BONUS GAME STARTED!');
-    this.spin(); // Start første bonus-spin automatisk
-  }
-
-  endBonus() {
-    this.inBonus = false;
-    this.bonusSpinsLeft = 0;
-    this.bonusText.text = '';
-    console.log('🔚 BONUS GAME ENDED');
-    this.gui.setEnabled(true);
-  }
-
-  updateBonusText() {
-    this.bonusText.text = `BONUSSPINS: ${this.bonusSpinsLeft}/10`;
-  }
-
-
 }

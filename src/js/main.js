@@ -11,10 +11,10 @@ import { Game } from './Game.js';
   document.body.appendChild(app.canvas);
 
   const imageNames = [
-    '10', 'j', 'q', 'k', 'a',
-    'wild', 'scatter', 'mascot', 'baggrund', 'spinButton'
+    '7', '8', '9', '10', 'j', 'q', 'k', 'a',
+    'wild', 'scatter', 'mascot', 'baggrund', 'spinButton',
+    'mascot_cindy_front'
   ];
-
   const assets = imageNames.map(name => `/assets/images/${name}.png`);
   await Assets.load(assets);
 
