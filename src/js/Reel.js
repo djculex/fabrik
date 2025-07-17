@@ -10,27 +10,27 @@ export class Reel {
     this.symbols = [];
 
     for (let y = 0; y < this.rows; y++) {
-      const symbol = this.mechanics.getRandomSymbol();
-      const sprite = PIXI.Sprite.from(`/assets/images/${symbol}.png`);
-      sprite.x = 0;
-      sprite.y = y * 100;
+      const symbolName = this.mechanics.getRandomSymbol();
+      const sprite = PIXI.Sprite.from(`/assets/images/${symbolName}.png`);
       sprite.width = 100;
       sprite.height = 100;
+      sprite.x = 0;
+      sprite.y = y * 100;
       this.container.addChild(sprite);
 
-      this.symbols.push({ symbol, sprite });
+      this.symbols.push({ symbol: symbolName, sprite });
     }
   }
 
   async spin() {
-    // F.eks. vent 500 ms for at simulere spin
-    await new Promise(resolve => setTimeout(resolve, 500));
-
+    // Simpel spin: udskift alle symboler med nye tilfældige
     for (let y = 0; y < this.rows; y++) {
       const newSymbol = this.mechanics.getRandomSymbol();
       const sprite = this.symbols[y].sprite;
       sprite.texture = PIXI.Texture.from(`/assets/images/${newSymbol}.png`);
       this.symbols[y].symbol = newSymbol;
+      // Vent lidt mellem hver opdatering for effekt (valgfrit)
+      await new Promise(r => setTimeout(r, 100));
     }
   }
 }

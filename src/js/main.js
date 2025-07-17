@@ -12,9 +12,9 @@ import { Game } from './Game.js';
 
   const imageNames = [
     '7', '8', '9', '10', 'j', 'q', 'k', 'a',
-    'wild', 'scatter', 'mascot', 'baggrund', 'spinButton',
-    'mascot_cindy_front'
+    'wild', 'scatter', 'mascot_cindy_front', 'spinButton', 'baggrund'
   ];
+
   const assets = imageNames.map(name => `/assets/images/${name}.png`);
   await Assets.load(assets);
 
