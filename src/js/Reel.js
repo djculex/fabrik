@@ -1,51 +1,75 @@
 import * as PIXI from 'pixi.js';
-import gsap from 'gsap';
+import { gsap } from 'gsap';
 
 export class Reel {
-  constructor(index, rows, mechanics) {
+  constructor(index, mechanics) {
     this.index = index;
-    this.rows = rows;
     this.mechanics = mechanics;
+    this.symbolHeight = 100;
+    this.visibleSymbols = 5;
+    this.totalSymbols = 200;
 
+    // Reel container
     this.container = new PIXI.Container();
-    this.symbols = [];
 
-    for (let y = 0; y < this.rows; y++) {
-      const symbol = this.mechanics.getRandomSymbol();
-      const sprite = PIXI.Sprite.from(`/assets/images/${symbol}.png`);
-      sprite.x = 0;
-      sprite.y = y * 100;
+    // Symboler i en intern container som flyttes
+    this.symbolContainer = new PIXI.Container();
+    this.container.addChild(this.symbolContainer);
+
+    // Tilføj symboler
+    this.symbols = [];
+    for (let i = 0; i < this.totalSymbols; i++) {
+      const name = this.getRandomSymbol(index);
+      const sprite = PIXI.Sprite.from(`/assets/images/${name}.png`);
+      sprite.y = i * this.symbolHeight;
       sprite.width = 100;
-      sprite.height = 100;
-      this.container.addChild(sprite);
-      this.symbols.push({ symbol, sprite });
+      sprite.height = this.symbolHeight;
+      this.symbolContainer.addChild(sprite);
+      this.symbols.push({ name, sprite });
     }
+
+    // Mask – kun 5 synlige symboler
+    const mask = new PIXI.Graphics();
+    mask.beginFill(0xffffff);
+    mask.drawRect(0, 0, 100, this.visibleSymbols * this.symbolHeight);
+    mask.endFill();
+
+    this.container.addChild(mask);
+    this.symbolContainer.mask = mask;
+
+    // Position reel horisontalt
+    this.container.x = index * 100;
   }
 
-  spin(duration = 2) {
-    return new Promise((resolve) => {
-      const timeline = gsap.timeline({
-        onComplete: () => {
-          // Når animationen slutter, opdater symbolerne med nye tilfældige
-          for (let y = 0; y < this.rows; y++) {
-            const newSymbol = this.mechanics.getRandomSymbol();
-            const sprite = this.symbols[y].sprite;
-            sprite.texture = PIXI.Texture.from(`/assets/images/${newSymbol}.png`);
-            this.symbols[y].symbol = newSymbol;
-          }
-          resolve();
-        }
-      });
+  // Symbolvalg (uden wild i reel 0)
+  getRandomSymbol(reelIndex) {
+    if (reelIndex === 0) {
+      return this.mechanics.getRandomSymbolWithoutWild();
+    }
+    return this.mechanics.getRandomSymbol();
+  }
 
-      // Animer containerens y for at fake spin
-      // Laver et loop på 100px * rows for at skabe spin effekt
-      timeline.to(this.container, {
-        y: this.container.y + 100 * this.rows,
-        duration: duration,
-        ease: "power2.inOut",
-        repeat: 3,
-        yoyo: false,
+  async spin(duration = 4) {
+    // Start længere oppe og scroll ned
+    this.symbolContainer.y = -this.symbolHeight * (this.totalSymbols - this.visibleSymbols);
+
+    return new Promise(resolve => {
+      gsap.to(this.symbolContainer, {
+        y: 0,
+        duration,
+        ease: 'back.out(1.7)',
+        onComplete: resolve
       });
     });
+  }
+
+  // Bruges til scatter-check fx
+  getVisibleSymbols() {
+    const result = [];
+    for (let i = 0; i < this.visibleSymbols; i++) {
+      const idx = this.totalSymbols - this.visibleSymbols + i;
+      result.push(this.symbols[idx].name);
+    }
+    return result;
   }
 }

@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-export class SymbolIcon {
+export class Symbol {
   constructor(name) {
     this.name = name;
     this.sprite = PIXI.Sprite.from(`/assets/images/${name}.png`);
@@ -15,5 +15,9 @@ export class SymbolIcon {
 
   isScatter() {
     return this.name === 'scatter';
+  }
+
+  isWild() {
+    return this.name === 'wild';
   }
 }

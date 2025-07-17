@@ -4,46 +4,42 @@ export class GUI {
   constructor(onSpin) {
     this.container = new PIXI.Container();
 
-    this.button = PIXI.Sprite.from('/assets/images/spinButton.png');
-    this.button.width = 150;
-    this.button.height = 80;
-    this.button.interactive = true;
-    this.button.buttonMode = true;
-    this.container.addChild(this.button);
+    const mascot = PIXI.Sprite.from('/assets/images/mascot_cindy_front.png');
+    mascot.width = 200;
+    mascot.height = 300;
+    this.container.addChild(mascot);
+    this.mascot = mascot;
 
-    this.label = new PIXI.Text({
-      text: 'SPIN',
-      style: {
-        fontSize: 24,
-        fill: '#ffffff',
-        fontWeight: 'bold',
-        stroke: '#000000',
-        strokeThickness: 4
-      }
-    });
-    this.label.anchor.set(0.5);
+    const button = PIXI.Sprite.from('/assets/images/spinButton.png');
+    button.width = 150;
+    button.height = 80;
+    button.interactive = true;
+    button.buttonMode = true;
+    this.container.addChild(button);
+    this.button = button;
 
-    // 👉 Sæt position her, efter vi kender button størrelse
-    this.label.x = this.button.x + this.button.width / 2;
-    this.label.y = this.button.y + this.button.height / 2;
-
-    this.container.addChild(this.label);
-
-    this.setEnabled(true);
+    const label = new PIXI.Text({ text: 'SPIN', style: {
+      fontFamily: 'Arial', fontSize: 24,
+      fill: 0xffffff, stroke: 0x000000, strokeThickness: 4
+    }});
+    label.anchor.set(0.5);
+    label.x = button.width / 2;
+    label.y = button.height / 2;
+    button.addChild(label);
 
     this.button.on('pointerdown', () => {
-      if (this.enabled && onSpin) {
+      if (this.enabled) {
         this.setEnabled(false);
         onSpin();
       }
     });
+
+    this.setEnabled(true);
   }
 
-  setEnabled(state) {
-    this.enabled = state;
-    this.button.alpha = state ? 1 : 0.5;
-
-    this.button.interactive = state;
-    this.label.text = state ? 'SPIN' : 'SPINNER...';
+  setEnabled(val) {
+    this.enabled = val;
+    this.button.alpha = val ? 1 : 0.5;
+    this.button.interactive = val;
   }
 }
