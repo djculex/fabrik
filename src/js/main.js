@@ -20,5 +20,4 @@ import { Game } from './Game.js';
 
   const game = new Game();
   app.stage.addChild(game.container);
-  game.start();
 })();

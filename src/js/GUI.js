@@ -11,15 +11,22 @@ export class GUI {
     this.button.buttonMode = true;
     this.container.addChild(this.button);
 
-    // Centrer label på knappen
-    this.label = new PIXI.Text('SPIN', {
-      fontSize: 24,
-      fill: 0xffffff,
-      fontWeight: 'bold',
-      stroke: '#000000',
-      strokeThickness: 4
+    this.label = new PIXI.Text({
+      text: 'SPIN',
+      style: {
+        fontSize: 24,
+        fill: '#ffffff',
+        fontWeight: 'bold',
+        stroke: '#000000',
+        strokeThickness: 4
+      }
     });
     this.label.anchor.set(0.5);
+
+    // 👉 Sæt position her, efter vi kender button størrelse
+    this.label.x = this.button.x + this.button.width / 2;
+    this.label.y = this.button.y + this.button.height / 2;
+
     this.container.addChild(this.label);
 
     this.setEnabled(true);
@@ -36,16 +43,7 @@ export class GUI {
     this.enabled = state;
     this.button.alpha = state ? 1 : 0.5;
 
-    if (state) {
-      this.button.interactive = true;
-      this.label.text = 'SPIN';
-    } else {
-      this.button.interactive = false;
-      this.label.text = 'SPINNER...';
-    }
-
-    // Opdater label position midt på knappen
-    this.label.x = this.button.x + this.button.width / 2;
-    this.label.y = this.button.y + this.button.height / 2;
+    this.button.interactive = state;
+    this.label.text = state ? 'SPIN' : 'SPINNER...';
   }
 }
